@@ -4,9 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-11-16
+
+### Fixed
+
+- **SMS Character Encoding**: Fixed character encoding issues in URL shortener for SMS delivery
+  - Modified `NanoIDStrategy` to use Base62 alphabet (0-9, A-Z, a-z) instead of default Nanoid alphabet
+  - Added validation to `ShortenedUrl` model to ensure only SMS-safe characters (no underscore, hyphen, or special chars)
+  - Prevents underscore character corruption in SMS messages (underscore appearing as inverted question mark)
+  - All strategies now generate SMS-safe short codes compatible with GSM 7-bit encoding
+  - Added comprehensive test suite (36 tests) covering character validation and SMS safety
+  - Backward compatibility: existing URLs with underscores continue to work in browsers
+  - See [SMS_SAFE_URLS_MIGRATION.md](../../SMS_SAFE_URLS_MIGRATION.md) for migration details
+
 ## [0.4.0] - 2025-08-09
 
 ### Added
+
 - **Comprehensive Security Testing**: Added extensive security test suites to prevent various attacks
   - API security tests covering SQL injection, XSS, CSRF, and authentication bypass attempts
   - Redirect security tests for URL validation and malicious redirect prevention
@@ -22,6 +36,7 @@ All notable changes to this project will be documented in this file.
   - Documentation for click event integration and usage
 
 ### Enhanced
+
 - **Event Publishing**: Improved click event publishing system with better error handling and testing
 - **Test Coverage**: Significantly expanded test coverage across security, events, and host authorization
 - **Documentation**: Added detailed documentation for click events and instrumentation
