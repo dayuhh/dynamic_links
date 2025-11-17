@@ -243,6 +243,39 @@ Depending on the strategy you choose, you may need to install additional depende
 
 Ensure you bundle these dependencies along with the DynamicLinks gem if you plan to use these strategies.
 
+### SMS-Safe URL Generation
+
+**All shortening strategies generate SMS-safe URLs using Base62 encoding** (0-9, A-Z, a-z). This ensures compatibility with SMS delivery systems that use GSM 7-bit encoding.
+
+#### Character Set
+
+Short URLs contain **only alphanumeric characters**:
+- Digits: `0-9`
+- Uppercase letters: `A-Z`
+- Lowercase letters: `a-z`
+
+**Excluded characters**: underscore (_), hyphen (-), and other special characters that may cause issues with SMS encoding or URL interpretation.
+
+#### Why This Matters
+
+SMS carriers use GSM 7-bit encoding, which can corrupt certain characters like underscore (_). By using only Base62 characters, we ensure:
+- URLs display correctly in SMS messages
+- No character corruption during transmission
+- Maximum compatibility across all SMS carriers
+- URL-safe without requiring percent encoding
+
+#### Strategy-Specific Notes
+
+- **NanoIDStrategy**: Uses custom SMS-safe alphabet (Base62)
+- **MD5/SHA256/CRC32 Strategies**: Use Base62 encoding by default
+- **RedisCounterStrategy**: Uses Base62 encoding by default
+
+#### Validation
+
+The `ShortenedUrl` model validates that all short URLs use only SMS-safe characters. Attempts to create URLs with problematic characters will be rejected with a validation error.
+
+For more details on the SMS-safe URL implementation and migration, see [SMS_SAFE_URLS_MIGRATION.md](../../SMS_SAFE_URLS_MIGRATION.md).
+
 ## Installation
 
 Add this line to your application's Gemfile:
