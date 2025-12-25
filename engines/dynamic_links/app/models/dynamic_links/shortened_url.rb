@@ -33,10 +33,11 @@ module DynamicLinks
     validate :short_url_length_within_limit
     validate :short_url_uses_safe_characters
 
-    def self.find_or_create!(client, short_url, url)
+    def self.find_or_create!(client, short_url, url, expires_at: nil)
       transaction do
         record = find_or_create_by!(client: client, short_url: short_url) do |record|
           record.url = url
+          record.expires_at = expires_at if expires_at.present?
         end
         record
       end
