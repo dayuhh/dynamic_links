@@ -172,6 +172,36 @@ module DynamicLinks
       assert_not shortened_url.expired?, 'Expected shortened_url without expires_at to not be expired'
     end
 
+    test 'should not allow expires_at in the past' do
+      shortened_url = DynamicLinks::ShortenedUrl.new(
+        client: @client,
+        url: @url,
+        short_url: 'pastexp',
+        expires_at: 1.day.ago
+      )
+      assert_not shortened_url.valid?
+      assert_includes shortened_url.errors[:expires_at], 'must be in the future'
+    end
+
+    test 'should allow expires_at in the future' do
+      shortened_url = DynamicLinks::ShortenedUrl.new(
+        client: @client,
+        url: @url,
+        short_url: 'futureexp',
+        expires_at: 1.day.from_now
+      )
+      assert shortened_url.valid?
+    end
+
+    test 'should allow nil expires_at' do
+      shortened_url = DynamicLinks::ShortenedUrl.new(
+        client: @client,
+        url: @url,
+        short_url: 'noexpiry'
+      )
+      assert shortened_url.valid?
+    end
+
     test 'find_or_create! should create new record if not exists' do
       assert_difference 'DynamicLinks::ShortenedUrl.count', 1 do
         DynamicLinks::ShortenedUrl.find_or_create!(@client, @short_url, @url)

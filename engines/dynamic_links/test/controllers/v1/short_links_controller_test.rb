@@ -232,6 +232,19 @@ module DynamicLinks
         body = JSON.parse(response.body)
         assert_includes body['error'], 'Invalid expires_at format'
       end
+
+      test 'should reject expires_at in the past' do
+        DynamicLinks.configuration.enable_rest_api = true
+
+        url = "https://example.com/past-expiry-#{SecureRandom.hex(4)}"
+        past_expires_at = (Time.zone.now - 1.day).iso8601
+
+        post '/v1/shortLinks', params: { url: url, api_key: @client.api_key, expires_at: past_expires_at }
+
+        assert_response :internal_server_error
+        body = JSON.parse(response.body)
+        assert_includes body['error'], 'An error occurred while processing your request'
+      end
     end
   end
 end
